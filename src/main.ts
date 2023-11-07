@@ -1,11 +1,19 @@
-import { INestApplication } from '@nestjs/common';
+import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
+import { NestExpressApplication } from '@nestjs/platform-express';
+import { join } from 'path';
 import { AppModule } from './app.module';
-import { ValidationPipe } from './common/pipe/validation.pipe';
 
 async function bootstrap() {
-  const app: INestApplication<any> = await NestFactory.create(AppModule);
+  const app: NestExpressApplication =
+    await NestFactory.create<NestExpressApplication>(AppModule);
+
   app.useGlobalPipes(new ValidationPipe());
+
+  app.useStaticAssets(join(__dirname, '..', 'public'));
+  app.setBaseViewsDir(join(__dirname, '..', 'views'));
+  app.setViewEngine('hbs');
+
   await app.listen(3000);
 }
 bootstrap();
